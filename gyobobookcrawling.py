@@ -28,3 +28,60 @@ for i in range(len(title_list)):
     txt_f.write(f'제목: {title_list[i]} \n')
 
 txt_f.close()
+
+
+
+from urllib import request, parse
+from bs4 import BeautifulSoup as bs
+
+txt_f = open("./bookchart.txt","w")
+
+data = parse.urlencode({'perPage':'50'}).encode()
+req = request.Request('http://www.kyobobook.co.kr/bestSellerNew/bestseller.laf', data=data)
+html = request.urlopen(req)
+bsObject = bs(html, "html.parser")
+
+
+#집계기준 보여주기
+week_standard = bsObject.find('h4', {'class':'title_best_basic'}).find('small').text
+print(week_standard)
+
+
+# 제목과 링크 출력하기
+bestseller_contents = bsObject.find('ul', {'class':'list_type01'})
+bestseller_list = bestseller_contents.findAll('div', {'class':'detail'})
+bestseller_contents
+title_list = [b.find('div', {'class': 'title'}).find('strong').text for b in bestseller_list]
+title_href_list = [b.find('div', {'class': 'title'}).a['href'] for b in bestseller_list]
+
+#for i in range(len(title_list)):
+#    print("제목: "+title_list[i] + " 링크: "+ title_href_list[i])
+#    txt_f.write(f'제목: {title_list[i]} 링크: {title_href_list[i]} \n')
+
+
+# 작가와 출판사 출력하기
+for i in range(len(title_href_list)):
+
+    data = parse.urlencode({'perPage': '50'}).encode()
+    req = request.Request(title_href_list[i], data=data)
+    html = request.urlopen(req)
+    bsObject = bs(html, "html.parser")
+
+
+    #작가찾기1
+    #bsObject_div = bsObject.find('div', {'class': 'author'})
+    #bestseller_div_span = bsObject_div.findAll('span', {'class': 'name'})
+    #bestseller_div_span_a = bestseller_div_span[0].get_text()
+    #print("작가 : " + bestseller_div_span_a.strip())
+    #txt_f.write(f'작가: {bestseller_div_span_a.strip()} \n')
+
+    #작가출판사2
+    bestseller_div_span_a = bsObject.find('title').text
+    print("제목 작가 출판사 : " + bestseller_div_span_a)
+    txt_f.write(f'제목 작가 출판사 : {bestseller_div_span_a.strip()} \n')
+
+
+print("완료")
+
+
+txt_f.close()
