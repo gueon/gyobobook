@@ -30,7 +30,7 @@ for i in range(len(title_list)):
 txt_f.close()
 
 
-
+# 학생 2 책 제목, 작가, 출판사 출력
 from urllib import request, parse
 from bs4 import BeautifulSoup as bs
 
